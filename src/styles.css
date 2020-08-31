@@ -1,0 +1,56 @@
+body {
+  margin: 0;
+  padding: 0;
+  background: #eee;
+  overscroll-behavior: none;
+}
+
+.App {
+  font-family: sans-serif;
+}
+
+.bottom-sheet-wrapper {
+  height: 100vh;
+  width: 100vw;
+  overflow-y: auto;
+}
+
+.bottom-sheet {
+  background: white;
+  border-radius: 20px 20px 0 0;
+  padding: 0 8px 16px 8px;
+  box-sizing: border-box;
+  position: fixed;
+  width: 100%;
+  top: calc(100% + 20px);
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+  user-select: none;
+  transition: all 0.2s ease;
+  transform: translateY(calc(0));
+}
+
+.bottom-sheet.dragging {
+  transition: none;
+}
+
+.bottom-sheet.show {
+  transform: translateY(calc(-100% - 20px));
+}
+
+.bottom-sheet > div:not(.bottom-sheet-grip) {
+  padding: 4px;
+}
+
+.bottom-sheet-grip {
+  padding: 16px;
+  -ms-touch-action: pan-y;
+  touch-action: pan-y;
+}
+
+.bottom-sheet-grip > div {
+  margin: 0 auto;
+  height: 4px;
+  background: black;
+  border-radius: 2px;
+  width: 25%;
+}
