@@ -9,14 +9,23 @@ export default function BottomSheet({ show, onHide, children }) {
   const [translateStyle, setTranslateStyle] = React.useState("0");
   const [dragging, setDragging] = React.useState(false);
 
+  const setDefaults = () => {
+    startPosition = 0;
+    currentPosition = 0;
+    oldTranslateBy = 0;
+    translateBy = 0;
+  };
+
   const handleMouseDown = () => {
     setDragging(true);
+    setDefaults();
     document.addEventListener("mousemove", handleMouseMove);
     document.addEventListener("mouseup", handleMouseUp);
   };
 
   const handleTouchStart = () => {
     setDragging(true);
+    setDefaults();
     document.addEventListener("touchmove", handleTouchMove);
   };
 
@@ -26,7 +35,7 @@ export default function BottomSheet({ show, onHide, children }) {
     handleRelease();
   };
 
-  const handleRelease = () => {
+  const handleRelease = React.useCallback(() => {
     if (translateBy <= oldTranslateBy && translateBy !== 0) {
       translateBy = 0;
       setTranslateStyle("0");
@@ -36,16 +45,9 @@ export default function BottomSheet({ show, onHide, children }) {
       translateBy = 0;
       oldTranslateBy = 0;
     }
-  };
+  }, [setTranslateStyle, onHide]);
 
-  const handleMouseUp = () => {
-    setDragging(false);
-    document.removeEventListener("mousemove", handleMouseMove);
-    document.removeEventListener("mouseup", handleMouseUp);
-    handleRelease();
-  };
-
-  const handleMove = (y) => {
+  const handleMove = React.useCallback((y) => {
     if (startPosition === 0 && currentPosition === 0) {
       startPosition = y;
     }
@@ -65,17 +67,38 @@ export default function BottomSheet({ show, onHide, children }) {
 
     setTranslateStyle(`-100% - 20px - ${newPosition}px`);
     currentPosition = y;
-  };
+  }, []);
 
-  const handleTouchMove = (e) => {
-    e.preventDefault();
-    const touch = e.touches[0] || e.changedTouches[0];
-    handleMove(touch.pageY.toFixed(0));
-  };
+  const handleTouchMove = React.useCallback(
+    (e) => {
+      e.preventDefault();
+      const touch = e.touches[0] || e.changedTouches[0];
+      handleMove(touch.pageY);
+    },
+    [handleMove]
+  );
 
-  const handleMouseMove = (e) => {
-    handleMove(e.clientY);
-  };
+  const handleMouseMove = React.useCallback(
+    (e) => {
+      handleMove(e.clientY);
+    },
+    [handleMove]
+  );
+
+  const handleMouseUp = React.useCallback(() => {
+    setDragging(false);
+    document.removeEventListener("mousemove", handleMouseMove);
+    document.removeEventListener("mouseup", handleMouseUp);
+    handleRelease();
+  }, [setDragging, handleRelease, handleMouseMove]);
+
+  React.useEffect(() => {
+    if (!show) {
+      document.removeEventListener("touchmove", handleTouchMove);
+      document.removeEventListener("mousemove", handleMouseMove);
+      document.removeEventListener("mouseup", handleMouseUp);
+    }
+  }, [show, handleTouchMove, handleMouseMove, handleMouseUp]);
 
   return (
     <div

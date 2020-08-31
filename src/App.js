@@ -8,6 +8,7 @@ export default function App() {
 
   const handleShowClick = () => {
     setShow(true);
+    setShow2(false);
   };
 
   const handleHide = () => {
@@ -16,6 +17,7 @@ export default function App() {
 
   const handleShow2Click = () => {
     setShow2(true);
+    setShow(false);
   };
 
   const handleHide2 = () => {
